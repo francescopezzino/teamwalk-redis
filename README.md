@@ -1,5 +1,6 @@
 ## Implements the hybrid Caffeine (L1) and Redis (L2) caching architecture
 Spring Boot application with a multi-level (hybrid) cache—using Caffeine for fast local memory access and Redis for distributed consistency—backed by MySQL.
+Local caches, like Caffeine, provide extremely fast data retrieval because they operate in memory and are close to the application. These are ideal for reducing response times for frequently accessed data. On the other hand, distributed caches, such as those powered by Redisson with Redis, offer scalability and consistency across multiple instances of an application. Distributed caches ensure all nodes in a distributed system access the same up-to-date data, which is crucial in multi-node environments.
 ### 1. Configuration & Build
    •	pom.xml: Added spring-boot-starter-cache, caffeine, and spring-boot-starter-data-redis.
    •	src/main/java/com/hugecorp/teamwalk/config/CacheConfig.java:  Defines the CompositeCacheManager and CacheErrorHandler to coordinate both local and distributed layers.
