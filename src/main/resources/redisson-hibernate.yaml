@@ -1,0 +1,16 @@
+# src/main/resources/redisson-hibernate.yaml
+singleServerConfig:
+  address: "redis://127.0.0.1:6379"
+  # Connection settings
+  connectTimeout: 10000
+  timeout: 3000
+  # Ensure these are indented under singleServerConfig
+#  retryAttempts: 3
+#  retryInterval: 1500
+  connectionPoolSize: 64
+  connectionMinimumIdleSize: 24
+
+threads: 16
+nettyThreads: 32
+# Use the updated 2026 codec definition if needed
+codec: !<org.redisson.codec.JsonJacksonCodec> {}

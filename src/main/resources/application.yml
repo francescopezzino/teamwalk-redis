@@ -1,0 +1,67 @@
+#spring.application.name=teamwalk-redis
+
+spring:
+  threads:
+    virtual:
+      enabled: true
+  application:
+    name: teamwalk-redis
+  datasource:
+    url: jdbc:mysql://localhost:3306/TEAMWALK?serverTimezone=UTC
+    username: administrator
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        # Enable 2026 L2 cache support if using Hibernate Query Cache
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true # Optional: enable if you want to cache query results
+          region.factory_class: org.redisson.hibernate.RedissonRegionFactory
+          redisson.config: redisson-hibernate.yaml
+        ddl-auto: update
+        dialect: org.hibernate.dialect.MySQLDialect
+  # General Cache Configuration
+  cache:
+    # Set the primary cache type (e.g., redis or caffeine)
+#    type: redis
+    type: caffeine # Default type for the primary manager
+    cache-names:
+      - teams
+      - employees
+      - step_counters
+      - leaderboard
+    # Caffeine-specific basic specification
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=60s
+    redis:
+      time-to-live: 3600000 # 1 hour L2 TTL
+  # Redis Connection Details (Spring Data Redis)
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      # password: yourpassword
+      timeout: 2000ms
+      repositories:
+        enabled: false # Disables Redis Repositories while keeping Redis Caching active
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 5
+          min-idle: 1
+logging:
+  level:
+    org.springframework.cache: TRACE
+
+  # Jackson 3 configuration (Standard for Spring Boot 4.0 in 2026)
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+      write-dates-as-timestamps: false
