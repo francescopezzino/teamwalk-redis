@@ -3,6 +3,7 @@ package com.fp.teamwalk.repos;
 
 import com.fp.teamwalk.domain.StepCounter;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -29,6 +30,9 @@ public interface StepCounterRepository extends JpaRepository<StepCounter, Long> 
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE StepCounter s SET s.steps = s.steps + :steps WHERE s.id = :id")
-    @CacheEvict(value = "step_counters", key = "#id")
+    @Caching(evict = {
+            @CacheEvict(value = "step_counters", key = "#id"),
+            @CacheEvict(value = "leaderboard", allEntries = true)
+    })
     void incrementSteps(@Param("id") Long id, @Param("steps") Integer steps);
 }

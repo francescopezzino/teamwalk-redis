@@ -30,7 +30,7 @@ public class TeamController {
      */
     @PutMapping("/addSteps/{employeeId}")
     @Operation(summary = "Add steps to a team's counter via an employee ID")
-    public ResponseEntity<StepCounterDTO> addStepsToTeam(
+    public ResponseEntity<StepCounterDTO> addStepsToTeamx(
             @PathVariable Long employeeId,
             @RequestParam @Min(1) Integer steps) {
 

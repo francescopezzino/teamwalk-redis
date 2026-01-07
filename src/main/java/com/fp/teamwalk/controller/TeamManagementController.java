@@ -44,38 +44,46 @@ public class TeamManagementController {
     @PostMapping("/addTeamStepCounter")
     @Operation(summary = "US 1: Assign a step counter to a team")
     public ResponseEntity<StepCounterDTO> createTeamStepCounter(@Valid @RequestBody StepCounterDTO request) {
-        return stepCounterService.addTeamStepCounter(request)
-                .map(dto -> {
-                    URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                            .path("/{id}")
-                            .buildAndExpand(dto.id())
-                            .toUri();
-                    return ResponseEntity.created(location).body(dto);
-                })
-                .orElse(ResponseEntity.badRequest().build());
+        Optional<StepCounterDTO> createdStepCounterOptional = stepCounterService.addTeamStepCounter(request);
+        if (createdStepCounterOptional.isPresent()) {
+            return createdStepCounterOptional.map(dto -> {
+                URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                        .path("/{id}")
+                        .buildAndExpand(dto.id())
+                        .toUri();
+                return ResponseEntity.created(location).body(dto);
+            }).get();
+        }
+        throw new UnsupportedOperationException("Some errors occurred, cannot create a step counter");
     }
 
     @PutMapping("/removeTeamStepCounter/{teamId}")
     @Operation(summary = "US 1: Disable/Remove a team's step counter")
     public ResponseEntity<TeamDTO> removeTeamStepCounterId(@PathVariable Long teamId) {
-        return teamService.removeStepCounter(teamId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        Optional<TeamDTO> team = teamService.removeStepCounter(teamId);
+        if (team.isPresent()) {
+            return team.map(ResponseEntity::ok).get();
+        }
+        throw new UnsupportedOperationException("Some errors occurred, cannot remove the step counter");
     }
 
     @GetMapping("/leaderboard")
     @Operation(summary = "US 4: View leaderboard (Sorted Descending)")
     public ResponseEntity<List<StepCounterDTO>> getLeaderboard() {
-        return stepCounterService.getAllTeamScoreDesc()
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent().build());
+        Optional<List<StepCounterDTO>> stepCountersOptional = stepCounterService.getAllTeamScoreDesc();
+        if (stepCountersOptional.isPresent()) {
+            return stepCountersOptional.map(ResponseEntity::ok).get();
+        }
+        throw new UnsupportedOperationException("The team score data is not available");
     }
 
     @GetMapping(value = "/leaderboardFlux", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "Stream leaderboard updates via Server-Sent Events (SSE)")
     public Flux<StepCounterDTO> getLeaderboardFlux() {
-        return stepCounterService.getAllTeamScoreDesc()
-                .map(Flux::fromIterable)
-                .orElse(Flux.empty());
+        Optional<List<StepCounterDTO>> stepCountersOptional = stepCounterService.getAllTeamScoreDesc();
+        if(stepCountersOptional.isPresent()) {
+            return stepCountersOptional.map(Flux::fromIterable).get();
+        }
+        throw new UnsupportedOperationException("The team score data is not available");
     }
 }
