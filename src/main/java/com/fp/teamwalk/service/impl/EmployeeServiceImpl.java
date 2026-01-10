@@ -45,10 +45,10 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     @Override
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(value = "teams", key = "#result.id", condition = "#result != null"),
-            @CacheEvict(value = "step_counters", allEntries = true),
-            @CacheEvict(value = "leaderboard", allEntries = true)
+    @Caching(evict =  {
+            @CacheEvict(value = "teams", key = "#result.id", beforeInvocation = true, condition = "#result != null"),
+            @CacheEvict(value = "step_counters", beforeInvocation = true, allEntries = true),
+            @CacheEvict(value = "leaderboard", beforeInvocation = true, allEntries = true)
     })
     public Optional<TeamDTO> addStepsToTeamStepCounterByEmployeeId(Long employeeId, Integer employeeSteps) {
         Employee employee = employeeRepository.findById(employeeId)

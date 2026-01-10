@@ -34,7 +34,7 @@ public class StepCounterServiceImpl implements StepCounterService {
      */
     @Override
     @Transactional
-    @CacheEvict(value = "leaderboard", allEntries = true)
+    @CacheEvict(value = "leaderboard", beforeInvocation = true, allEntries = true)
     public Optional<StepCounterDTO> addTeamStepCounter(StepCounterDTO stepCounterDto) {
         Team team = teamRepository.findById(stepCounterDto.teamId())
                 .orElseThrow(() -> new ResourceNotFoundException("Team not found"));

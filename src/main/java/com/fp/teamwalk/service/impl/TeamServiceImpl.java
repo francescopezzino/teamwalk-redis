@@ -31,7 +31,12 @@ public class TeamServiceImpl implements TeamService {
     @Override
     @Transactional
     // 2026 Best Practice: Evict all layers (L1/L2) for any new team to refresh leaderboard
-    @CacheEvict(value = "leaderboard", allEntries = true)
+
+    @Caching(evict = {
+            @CacheEvict(value = "employees", beforeInvocation = true, allEntries = true),
+            // Essential for 2026: Leaderboard must be cleared if a team's counter is disabled
+            @CacheEvict(value = "leaderboard", beforeInvocation = true, allEntries = true)
+    })
     public Optional<TeamDTO> createTeamWithEmployees(TeamDTO teamDto) {
         Team team = teamMapper.toTeamEntity(teamDto);
 
@@ -47,9 +52,9 @@ public class TeamServiceImpl implements TeamService {
     @Override
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "teams", key = "#id"),
+            @CacheEvict(value = "teams", beforeInvocation = true, key = "#id"),
             // Essential for 2026: Leaderboard must be cleared if a team's counter is disabled
-            @CacheEvict(value = "leaderboard", allEntries = true)
+            @CacheEvict(value = "leaderboard", beforeInvocation = true, allEntries = true)
     })
     public Optional<TeamDTO> removeStepCounter(Long id) {
         // Use optimized EntityGraph fetch to avoid N+1 queries during DTO mapping
